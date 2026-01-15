@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte Éducative Aléatoire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://cdn.pixabay.com/photo/2018/04/27/19/47/protest-3355688_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 50px;
+            color: #333;
+            text-align: center;
+        }
+        .card-container {
+            background: rgba(255, 255, 255, 0.92);
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        .symbols {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        button {
+            margin-top: 25px;
+            padding: 12px 28px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #555;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #222;
+        }
+    </style>
+    <script>
+        const cartesVertes = [
+            "L'égalité est un droit fondamental. (Bonus : avance de 2 cases si tu peux citer un droit humain.)",
+            "La diversité nous renforce. (Bonus : avance si tu nommes une figure de la lutte contre le racisme.)",
+            "Un monde sans discrimination est possible. (Bonus : avance si tu donnes un geste d'inclusion.)"
+        ];
+
+        function montrerCarte() {
+            const carteAleatoire = cartesVertes[Math.floor(Math.random() * cartesVertes.length)];
+            document.getElementById('carte').innerText = carteAleatoire;
+        }
+    </script>
+</head>
+<body onload="montrerCarte()">
+    <div class="card-container">
+        <div class="symbols">✊🏽✊🏿✊🏻</div>
+        <h1>Carte Éducative Aléatoire</h1>
+        <p id="carte" style="font-size: 1.4em;"></p>
+        <button onclick="montrerCarte()">Afficher une autre carte</button>
+    </div>
+</body>
+</html>
