@@ -1,92 +1,224 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Carte Verte</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-image: url('https://cdn.pixabay.com/photo/2018/04/27/19/47/protest-3355688_1280.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 50px;
-            text-align: center;
-            color: #333;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte interactive</title>
 
-        .card-container {
-            background: #3CB371; /* FOND VERT UNI */
-            border: 4px solid #1e4720;
-            border-radius: 20px;
-            padding: 60px;
-            max-width: 900px;
-            min-height: 450px;
-            margin: auto;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #004d00;
+  font-family: Arial, sans-serif;
+  color: white;
+<img src="croix-rouge.png" class="logo">
+.logo {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 180px;
+}
+}
 
-        .symbols {
-            font-size: 4em;
-            margin-bottom: 25px;
-            color: #fff;
-        }
+h1 {
+  position: absolute;
+  top: 20px;
+}
 
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-        }
+.carte-container {
+  perspective: 1000px;
+}
 
-        #carte {
-            font-size: 2em;
-            line-height: 1.4;
-            margin-top: 20px;
-            font-weight: bold;
-            color: #ffffff;
-        }
+.carte {
+  width: 480px;
+  height: 320px;
+  transform-style: preserve-3d;
+  transition: transform 0.7s;
+  position: relative;
+}
 
-        button {
-            margin-top: 35px;
-            padding: 18px 40px;
-            font-size: 1.3em;
-            color: #fff;
-            background-color: #2d572c;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+.carte.flip {
+  transform: rotateY(180deg);
+}
 
-        button:hover {
-            background-color: #1b361b;
-        }
-    </style>
+.face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #9cff9c;
+  border-radius: 18px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  backface-visibility: hidden;
+  color: black;
+  font-weight: bold;
+}
 
-    <script>
-        const cartesVertes = [
-            "L'égalité est un droit fondamental. (Bonus : avance de 2 cases si tu peux citer un droit humain.)",
-            "La diversité nous renforce. (Bonus : avance si tu nommes une figure de la lutte contre le racisme.)",
-            "Un monde sans discrimination est possible. (Bonus : avance si tu donnes un geste d'inclusion.)"
-        ];
+.back {
+  transform: rotateY(180deg);
+}
 
-        function montrerCarte() {
-            const carteAleatoire = cartesVertes[Math.floor(Math.random() * cartesVertes.length)];
-            document.getElementById('carte').innerText = carteAleatoire;
-        }
-    </script>
+.texte {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.9rem;
+  text-align: center;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2e7d32;
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+#nouvelle {
+  position: absolute;
+  bottom: 20px;
+}
+</style>
 </head>
 
-<body onload="montrerCarte()">
-    <div class="card-container">
-        <div class="symbols">✊🏽✊🏿✊🏻</div>
-        <h1>Carte Verte</h1>
-        <p id="carte"></p>
-        <button onclick="montrerCarte()">Afficher une autre carte</button>
+<body>
+
+<h1>CARTE VERTE JEU DE L'OIE RACISME</h1>
+
+<div class="carte-container">
+  <div class="carte" id="carte">
+
+    <!-- RECTO = QUESTION -->
+    <div class="face front">
+      <div class="texte" id="question"></div>
+      <button onclick="retourner()">Voir la réponse</button>
     </div>
+
+    <!-- VERSO = RÉPONSE -->
+    <div class="face back">
+      <div class="texte" id="reponse"></div>
+      <button onclick="retourner()">Voir la question</button>
+    </div>
+
+  </div>
+</div>
+
+<button id="nouvelle" onclick="nouvelleCarte()">Nouvelle carte</button>
+
+<script>
+const cartes = [
+{ q: "Comment définiriez-vous le racisme ?", r: "biais conscients et inconscients qui attribuent des valeurs, des privilèges et des opportunités humaines à certains groupes tout en opprimant et marginalisant d’autres" },
+
+{ q: "Quels sont les aspects du racisme ? se limitent-ils uniquement à la couleur de peau ?", r: "non, c’est toutes les différences de traitement exercées comme par exemple la couleur de peau mais aussi une religion, une origine, une situation économique…" },
+
+{ q: "Qu’est ce que le syndrome méditérranéen ?", r: "C’est un stéréotype médical selon lequel les personnes racisées semblent exagérer leurs symptômes et leurs douleurs" },
+
+{ q: "Qu’est ce que l’ignorance blanche ?", r: "Podcast : “ouvrir les yeux sur l’ignorance blanche de Delphine Saltel" },
+
+{ q: "Qu’est ce que l’impérialisme blanc ?", r: "Il désigne la domination politique, économique et culturelle exercée par les puissances européennes sur des territoires périphériques, justifiée par une idéologie de suprématie raciale et culturelle." },
+
+{ q: "Qu’est ce que la marginalisation ?", r: " limitation d’un groupe de personne vers un autre aux accès social, politique et économique de la société" },
+
+{ q: "Qu’est ce que le racisme quotidien ?", r: "racisme banalisé par le biais de l’humour, ou de propos commençant par “je ne suis pas raciste mais…”" },
+
+{ q: "Qu’est ce qu’un préjugé ?", r: "présumer et prendre des décisions en se fondant sur des renseignements et hypothèses inexacts et faussés" },
+
+{ q: "Quelle est la différence entre stéréotype et préjugé ?", r: "Un stéréotype est une représentation figée et réductrice d'un groupe, tandis qu'un préjugé est l'influence de ce stéréotype sur nos pensées et comportements." },
+
+{ q: "Que signifie le concept de privilège blanc ?", r: "La blanchité permet de tirer avantage involontairement, voire inconsciemment, du fait que d'autres personnes soient racisées et donc discriminées" },
+
+{ q: "Quelle est la différence entre discrimination directe et discrimination indirecte ?", r: "La discrimination est directe lorsqu'elle est visible. La discrimination est indirecte lorsque l’on désavantage inconsciemment certaines personnes par rapport à d'autres." },
+
+{ q: "Donner trois conséquences possibles du racisme sur un patient.", r: " appréhension à se faire soigner, retard de diagnostic, mauvaise prise en charge" },
+
+{ q: "Vrai ou faux : les préjugés sont toujours conscients ?", r: "faux= Il existe des  préjugés conscient = Que l’on peut exprimer clairement et inconscient =Ce sont des associations automatiques que l’on a intégrées sans s’en rendre compte." },
+
+{ q: "Donner un exemple de faits d’actualité en France qui prend en compte des propos racistes", r: "Naomi Musenga" },
+
+{ q: "Donner un exemple historique démontrant un acte raciste dans les soins", r: "triage aux urgences : attente très longue pour les personnes d’origine étrangère même si les symptômes sont plus graves" },
+
+{ q: "Qu’est ce que l’intersectionnalité ?", r: "L’intersectionnalité désigne la situation de personnes subissant simultanément plusieurs forme de discrimination qui [s’entrecroise, se recoupent et] s’intensifient mutuellement" },
+
+{ q: "Que veut dire l’expression “enlever ses lunettes ethnocentriques” ?", r: "Il s’agit de se décentrer de notre propre culture afin de ne pas influencer notre prise en soin" },
+
+{ q: "Donnez-moi trois exemples de jugements du soignant vers le patient.", r: "« vous êtes une chochotte », « trop douillette », « les femmes, on les connaît », « vous avez une faible résistance à la douleur »" },
+
+{ q: "Quels peuvent être les impacts au niveau de la santé physique et psychologique sur la prise en soin du patient ?", r: "Ils peut y avoir des impacts sur la santé mentale des patients, et aussi des soins qui peuvent être retardé ou des symptômes pas pris en compte" },
+
+{ q: "Quelles sont les sanctions qui peuvent être encourues en cas de propos racistes dans le soin ?", r: "Article 225-2 du code pénal : La discrimination définie aux articles 225-1 à 225-1-2, est punie de trois ans d'emprisonnement et de 45 000 euros d'amende" },
+
+{ q: "Quelles sont les conséquences du racisme sur la qualité de la prise en soin ?", r: "Inadéquation de la pratique professionnelle, minimisation des symptômes, conséquences pouvant entraîner la mort" },
+
+{ q: "Qui est la vénus Hottentote ?", r: "esclave du peuple khoïsan exhibé en France pour son physique et utilisé dans des expériences “ médicales”" },
+
+{ q: "Qu’est ce que la craniologie ?", r: "Il s’agit d’une science médicale venue légitimer les conquêtes coloniales et l’impérialisme blanc. La population noire était décrite ayant un crâne moins grand que la population blanche et était, par conséquent, considérée comme moins intelligente" },
+
+{ q: "Estimez combien il y a d'hôpitaux à Mayotte pour 300 000 habitants ? Et en Centre Val de Loire pour 2 millions d’habitants ?", r: "2 pour Mayotte, 73 pour Centre Val de Loire, soit 9 fois plus dans une région décrite comme un désert médical. En 2019, 45% des habitants de Mayotte de 15 ans ou plus déclarent avoir renoncé à des soins médicaux nécessaires ou les avoir reportés" },
+
+{ q: "Comment nomme-t-on les anciennes colonies françaises actuellement ?", r: "DROM-COM = Départements ou Régions français d'Outre-Mer-les Collectivités d'Outre-Mer" },
+
+{ q: "Comment les préjugés peuvent-ils influencer le diagnostic médical ?", r: "Les préjugés peuvent influencer le diagnostic médical, les symptômes peuvent être minimisés, des examens peuvent ne pas être effectués et cela peut retarder le diagnostic et la prise en soin des patients." },
+
+{ q: "Quels peuvent être les risques d’une prise en soin délétère envers un patient racisé ?", r: "Risque sur la santé pouvant aller jusqu’à la mort, risque sur santé mentale, manque de confiance en soi et envers les soignants" },
+
+{ q: "Pensez vous, d’un point de vue soignant, que les préjugés envers les patients influencent la prise en soin ?", r: "Oui sur divers points de la prise en charge : physique, psychologique …" },
+
+{ q: "Selon vous, quelles peuvent être les appréhensions des patients racisés lorsqu’ils viennent à être pris en soin ?", r: "Non prise en considération, discrimination, minisation de leurs symptômes…" },
+
+{ q: "Donnez 3 préjugés que peuvent porter les soignants envers les patients", r: "“au vue de ses origines, il est résistant à la douleur”, “encore un enfant, tout ça pour les allocations, ils profitent du système français”, “encore un nom imprononçable”" },
+
+{ q: "Donnez 3 préjugés que peuvent porter les patients envers les soignants", r: "“Est ce qu’il a vraiment son diplôme ce médecin rome ?”, “est ce qu’il comprend le français ?”, “vous allez me soigner avec les rituels de chez vous ?”" },
+
+{ q: "Pensez-vous que les préjugés peuvent être présents dans une prise en soin ?", r: "oui, de manière consciente ou inconsciente et ils peuvent entraîner des différences de traitement" },
+
+{ q: "Comment faire pour sensibiliser le personnel soignant ?", r: "s’appuyer sur les informations du rapport 2024 et de la loi, campagne de sensibilisation dans les établissements, former les équipes" },
+
+{ q: "En quoi le racisme systémique se distingue-t-il des actes racistes individuels ?", r: "Le racisme systémique renvoie à l'organisation de la société et aux structures qui reproduisent des inégalités fondées sur un processus de racialisation. Contrairement aux actes racistes individuels qui renvoient à la fois à l'attitude d'un individu et le comportement manifeste qui donne lieu à l'attitude envers l’individu." },
+
+{ q: "Comment le racisme peut-il influencer l’évaluation et la prise en charge de la douleur chez certains patients ?", r: "Le racisme peut influencer la prise en charge, par exemple un soignant peut penser qu’un patient va exagérer certains symptômes car ces personnes sont racisé, on appelle cela le syndrôme méditerranéen" },
+
+{ q: "Citer des événements historiques comme l’abolition de l’esclavage en 1848 en France ayant marqués une étape majeure dans la lutte contre le racisme institutionnel ?", r: "Création de SOS racisme en 1984 : association francaise qui a pour but de lutter contre le racisme, l’antisémitisme et les discriminations" },
+
+{ q: "Comment les biais implicites peuvent-ils impacter la relation soignant-soigné ?", r: "Difficulté pour construire une relation de confiance, pour communiquer sur les symptômes et les douleurs" },
+
+{ q: "En quoi la représentation des minorités dans les études médicales et les essais cliniques est-elle un enjeu de santé publique ?", r: "Sous-représentation peut causer une aggravation des inégalités mais peut surtout limiter l’applicabilité des résultats. Il y a des différences de réactions aux médicaments, aux maladies… C’est aussi très important pour réduire la méfiance envers la médecine." },
+
+{ q: "Vrai ou faux : Le racisme se manifeste uniquement par des insultes ou des actes intentionnels.", r: "Faux, racisme banalisé, quotidien dans la société" },
+
+{ q: "Vrai ou faux : L’intersectionnalité signifie qu’une personne peut subir plusieurs formes de discrimination en même temps (ex : origine, genre, classe sociale).", r: "Vrai, ces formes de discrimination vont agir les une sur les autres et les amplifier" }
+];
+
+const carte = document.getElementById("carte");
+const question = document.getElementById("question");
+const reponse = document.getElementById("reponse");
+
+function nouvelleCarte() {
+  const tirage = cartes[Math.floor(Math.random() * cartes.length)];
+  question.textContent = tirage.q;
+  reponse.textContent = tirage.r;
+  carte.classList.remove("flip");
+}
+
+function retourner() {
+  carte.classList.toggle("flip");
+}
+
+nouvelleCarte();
+</script>
+
+
 </body>
 </html>
-
 
